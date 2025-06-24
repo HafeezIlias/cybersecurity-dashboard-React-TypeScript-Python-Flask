@@ -204,10 +204,10 @@ const VisualizationsPage: React.FC = () => {
                       component="h1" 
                       sx={{ 
                         fontWeight: 800,
-                        background: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                         backgroundClip: 'text',
                         WebkitBackgroundClip: 'text',
-                        color: 'transparent',
+                        color: '#667eea', // Fallback color for better visibility
                         mb: 1,
                       }}
                     >

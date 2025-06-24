@@ -67,20 +67,21 @@ const CorrelationHeatmap: React.FC = () => {
   const { correlation_matrix, metrics, description } = data;
 
   return (
-    <Box>
-      <Box sx={{ overflowX: 'auto' }}>
-        <Box sx={{ minWidth: 400, p: 2 }}>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      {/* Correlation Matrix - Fixed height section */}
+      <Box sx={{ flex: '0 0 auto', overflowX: 'auto', mb: 2 }}>
+        <Box sx={{ minWidth: 400, p: 1 }}>
           {/* Header */}
           <Box display="flex" mb={1}>
-            <Box sx={{ width: 100 }} /> {/* Empty corner */}
+            <Box sx={{ width: 80 }} /> {/* Empty corner */}
             {metrics.map(metric => (
               <Box
                 key={metric}
                 sx={{
-                  width: 80,
+                  width: 70,
                   textAlign: 'center',
                   fontWeight: 'bold',
-                  fontSize: '0.875rem',
+                  fontSize: '0.8rem',
                 }}
               >
                 {metric}
@@ -94,11 +95,11 @@ const CorrelationHeatmap: React.FC = () => {
               {/* Row Label */}
               <Box
                 sx={{
-                  width: 100,
+                  width: 80,
                   display: 'flex',
                   alignItems: 'center',
                   fontWeight: 'bold',
-                  fontSize: '0.875rem',
+                  fontSize: '0.8rem',
                   pr: 1,
                 }}
               >
@@ -112,18 +113,18 @@ const CorrelationHeatmap: React.FC = () => {
                   <Box
                     key={colMetric}
                     sx={{
-                      width: 80,
-                      height: 40,
+                      width: 70,
+                      height: 35,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       backgroundColor: getCorrelationColor(value),
                       border: '1px solid rgba(0,0,0,0.1)',
                       borderRadius: 1,
-                      mx: 0.5,
+                      mx: 0.25,
                       color: Math.abs(value) > 0.5 ? 'white' : 'black',
                       fontWeight: 'bold',
-                      fontSize: '0.75rem',
+                      fontSize: '0.7rem',
                       cursor: 'pointer',
                     }}
                     title={`${rowMetric} vs ${colMetric}: ${value.toFixed(3)}`}
@@ -137,37 +138,40 @@ const CorrelationHeatmap: React.FC = () => {
         </Box>
       </Box>
 
-      {/* Legend */}
-      <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
-        <Typography variant="subtitle2" gutterBottom>
-          📊 Correlation Strength:
-        </Typography>
-        <Box display="flex" alignItems="center" gap={2} flexWrap="wrap">
-          <Box display="flex" alignItems="center" gap={1}>
-            <Box sx={{ width: 20, height: 20, bgcolor: 'rgba(76, 175, 80, 0.8)', borderRadius: 1 }} />
-            <Typography variant="caption">Positive (+1.0)</Typography>
-          </Box>
-          <Box display="flex" alignItems="center" gap={1}>
-            <Box sx={{ width: 20, height: 20, bgcolor: 'rgba(244, 67, 54, 0.8)', borderRadius: 1 }} />
-            <Typography variant="caption">Negative (-1.0)</Typography>
-          </Box>
-          <Box display="flex" alignItems="center" gap={1}>
-            <Box sx={{ width: 20, height: 20, bgcolor: 'rgba(158, 158, 158, 0.3)', borderRadius: 1 }} />
-            <Typography variant="caption">No correlation (0.0)</Typography>
+      {/* Scrollable content section */}
+      <Box sx={{ flex: '1 1 auto', overflow: 'auto', minHeight: 0 }}>
+        {/* Legend */}
+        <Box sx={{ p: 1.5, bgcolor: 'rgba(255, 255, 255, 0.05)', borderRadius: 1, mb: 2 }}>
+          <Typography variant="subtitle2" gutterBottom sx={{ fontSize: '0.8rem' }}>
+            📊 Correlation Strength:
+          </Typography>
+          <Box display="flex" alignItems="center" gap={1.5} flexWrap="wrap">
+            <Box display="flex" alignItems="center" gap={0.5}>
+              <Box sx={{ width: 16, height: 16, bgcolor: 'rgba(76, 175, 80, 0.8)', borderRadius: 1 }} />
+              <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>Positive (+1.0)</Typography>
+            </Box>
+            <Box display="flex" alignItems="center" gap={0.5}>
+              <Box sx={{ width: 16, height: 16, bgcolor: 'rgba(244, 67, 54, 0.8)', borderRadius: 1 }} />
+              <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>Negative (-1.0)</Typography>
+            </Box>
+            <Box display="flex" alignItems="center" gap={0.5}>
+              <Box sx={{ width: 16, height: 16, bgcolor: 'rgba(158, 158, 158, 0.3)', borderRadius: 1 }} />
+              <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>No correlation (0.0)</Typography>
+            </Box>
           </Box>
         </Box>
-      </Box>
 
-      {/* Metrics Description */}
-      <Box sx={{ mt: 2 }}>
-        <Typography variant="subtitle2" gutterBottom>
-          📝 Metrics Description:
-        </Typography>
-        {Object.entries(description).map(([metric, desc]) => (
-          <Typography key={metric} variant="caption" display="block" sx={{ mb: 0.5 }}>
-            <strong>{metric}:</strong> {desc}
+        {/* Metrics Description */}
+        <Box>
+          <Typography variant="subtitle2" gutterBottom sx={{ fontSize: '0.8rem' }}>
+            📝 Metrics Description:
           </Typography>
-        ))}
+          {Object.entries(description).map(([metric, desc]) => (
+            <Typography key={metric} variant="caption" display="block" sx={{ mb: 0.5, fontSize: '0.7rem', lineHeight: 1.3 }}>
+              <strong>{metric}:</strong> {desc}
+            </Typography>
+          ))}
+        </Box>
       </Box>
     </Box>
   );
