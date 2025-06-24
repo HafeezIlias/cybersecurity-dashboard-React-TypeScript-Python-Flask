@@ -199,10 +199,10 @@ const Navigation: React.FC = () => {
         >
           <Security sx={{ fontSize: 24, color: 'primary.main', mb: 1 }} />
           <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.8rem' }}>
-            🛡️ Secured by AI
+            CyberShield AI
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.7rem', mt: 0.5 }}>
-            Real-time Protection
+            Advanced Security Platform
           </Typography>
         </Box>
       </Box>
