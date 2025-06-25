@@ -84,20 +84,23 @@ const ComparisonChart: React.FC<ComparisonChartProps> = ({ countries: propCountr
 
     switch (mode) {
       case 'customCountries':
-        // Custom country comparison - Fixed logic
+        // Custom country comparison - Fixed logic with normalized CEI
         if (selectedCountries.length === 0) return [];
         
         const customData = selectedCountries.map(country => {
           const data = {
             name: country.Country.length > 15 ? country.Country.substring(0, 15) + '...' : country.Country,
             fullName: country.Country,
-            CEI: Number(country.CEI) || 0,
+            CEI: Number(country.CEI) * 100 || 0, // Convert CEI from 0-1 to 0-100 scale
             GCI: Number(country.GCI) || 0,
             NCSI: Number(country.NCSI) || 0,
             DDL: Number(country.DDL) || 0,
-            'Risk Score': Number(country.Risk_Score) || 0,
+            'Risk Score': Number(country.Risk_Score) * 100 || 0, // Convert Risk_Score from 0-1 to 0-100 scale
             region: country.Region,
             riskCategory: country.Risk_Category,
+            // Keep original values for tooltip
+            originalCEI: Number(country.CEI) || 0,
+            originalRiskScore: Number(country.Risk_Score) || 0,
           };
           return data;
         });
@@ -122,12 +125,14 @@ const ComparisonChart: React.FC<ComparisonChartProps> = ({ countries: propCountr
 
           return {
             name: region,
-            CEI: Number(avgCEI.toFixed(1)),
+            CEI: Number((avgCEI * 100).toFixed(1)), // Convert CEI to 0-100 scale
             GCI: Number(avgGCI.toFixed(1)),
             NCSI: Number(avgNCSI.toFixed(1)),
             DDL: Number(avgDDL.toFixed(1)),
-            'Risk Score': Number(avgRisk.toFixed(1)),
+            'Risk Score': Number((avgRisk * 100).toFixed(1)), // Convert Risk_Score to 0-100 scale
             count: regionCountries.length,
+            originalCEI: Number(avgCEI.toFixed(3)),
+            originalRiskScore: Number(avgRisk.toFixed(3)),
           };
         }).sort((a, b) => b['Risk Score'] - a['Risk Score']);
 
@@ -139,12 +144,14 @@ const ComparisonChart: React.FC<ComparisonChartProps> = ({ countries: propCountr
           .map(country => ({
             name: country.Country.length > 15 ? country.Country.substring(0, 15) + '...' : country.Country,
             fullName: country.Country,
-            CEI: country.CEI || 0,
+            CEI: (country.CEI || 0) * 100, // Convert CEI to 0-100 scale
             GCI: country.GCI || 0,
             NCSI: country.NCSI || 0,
             DDL: country.DDL || 0,
-            'Risk Score': country.Risk_Score || 0,
+            'Risk Score': (country.Risk_Score || 0) * 100, // Convert Risk_Score to 0-100 scale
             region: country.Region,
+            originalCEI: country.CEI || 0,
+            originalRiskScore: country.Risk_Score || 0,
           }));
 
       case 'bottomCountries':
@@ -155,12 +162,14 @@ const ComparisonChart: React.FC<ComparisonChartProps> = ({ countries: propCountr
           .map(country => ({
             name: country.Country.length > 15 ? country.Country.substring(0, 15) + '...' : country.Country,
             fullName: country.Country,
-            CEI: country.CEI || 0,
+            CEI: (country.CEI || 0) * 100, // Convert CEI to 0-100 scale
             GCI: country.GCI || 0,
             NCSI: country.NCSI || 0,
             DDL: country.DDL || 0,
-            'Risk Score': country.Risk_Score || 0,
+            'Risk Score': (country.Risk_Score || 0) * 100, // Convert Risk_Score to 0-100 scale
             region: country.Region,
+            originalCEI: country.CEI || 0,
+            originalRiskScore: country.Risk_Score || 0,
           }));
 
       case 'riskLevels':
@@ -182,19 +191,21 @@ const ComparisonChart: React.FC<ComparisonChartProps> = ({ countries: propCountr
 
           return {
             name: riskLevel,
-            CEI: Number(avgCEI.toFixed(1)),
+            CEI: Number((avgCEI * 100).toFixed(1)), // Convert CEI to 0-100 scale
             GCI: Number(avgGCI.toFixed(1)),
             NCSI: Number(avgNCSI.toFixed(1)),
             DDL: Number(avgDDL.toFixed(1)),
-            'Risk Score': Number(avgRisk.toFixed(1)),
+            'Risk Score': Number((avgRisk * 100).toFixed(1)), // Convert Risk_Score to 0-100 scale
             count: riskCountries.length,
+            originalCEI: Number(avgCEI.toFixed(3)),
+            originalRiskScore: Number(avgRisk.toFixed(3)),
           };
         });
 
       default:
         return [];
     }
-  }, [countries, mode]);
+  }, [countries, mode, selectedCountries]);
 
   const getModeTitle = () => {
     switch (mode) {
@@ -257,27 +268,33 @@ const ComparisonChart: React.FC<ComparisonChartProps> = ({ countries: propCountr
             <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>
               {data.fullName || label}
             </Typography>
-            {payload.map((entry: any, index: number) => (
-              <Typography key={index} variant="body2" sx={{ color: entry.color }}>
-                {entry.dataKey}: {entry.value}
-                {entry.dataKey === 'DDL' ? '/10' : '/100'}
+            <Box>
+              <Typography variant="body2" sx={{ mb: 0.5 }}>
+                CEI: {data.originalCEI ? data.originalCEI.toFixed(3) : (data.CEI / 100).toFixed(3)}/1.0
               </Typography>
-            ))}
-            {data.count && (
-              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', mt: 1, display: 'block' }}>
-                Countries: {data.count}
+              <Typography variant="body2" sx={{ mb: 0.5 }}>
+                GCI: {data.GCI?.toFixed(1) || 0}/100
               </Typography>
-            )}
-            {data.region && (
-              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', display: 'block' }}>
-                Region: {data.region}
+              <Typography variant="body2" sx={{ mb: 0.5 }}>
+                NCSI: {data.NCSI?.toFixed(1) || 0}/100
               </Typography>
-            )}
-            {data.riskCategory && (
-              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', display: 'block' }}>
-                Risk Level: {data.riskCategory}
+              <Typography variant="body2" sx={{ mb: 0.5 }}>
+                DDL: {data.DDL?.toFixed(1) || 0}/100
               </Typography>
-            )}
+              <Typography variant="body2" sx={{ mb: 0.5 }}>
+                Risk Score: {data.originalRiskScore ? (data.originalRiskScore * 100).toFixed(1) : (data['Risk Score']?.toFixed(1) || 0)}/100
+              </Typography>
+              {data.region && (
+                <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                  Region: {data.region}
+                </Typography>
+              )}
+              {data.count && (
+                <Typography variant="caption" sx={{ display: 'block', color: 'rgba(255, 255, 255, 0.7)' }}>
+                  Countries: {data.count}
+                </Typography>
+              )}
+            </Box>
           </CardContent>
         </Card>
       );
@@ -484,7 +501,7 @@ const ComparisonChart: React.FC<ComparisonChartProps> = ({ countries: propCountr
       </Box>
 
       {/* Chart */}
-      <Box sx={{ flex: 1, minHeight: 400, height: 450, overflow: 'hidden', mt: 1 }}>
+      <Box sx={{ flex: 1, minHeight: 450, height: 500, overflow: 'hidden', mt: 1 }}>
         {mode === 'customCountries' && selectedCountries.length === 0 ? (
           <Box 
             display="flex" 
@@ -512,25 +529,25 @@ const ComparisonChart: React.FC<ComparisonChartProps> = ({ countries: propCountr
             <RechartsBarChart
               data={comparisonData}
               margin={{ 
-                top: 20, 
+                top: 20 , 
                 right: 30, 
                 left: 20, 
-                bottom: mode === 'customCountries' ? 80 : 60 
+                bottom: mode === 'customCountries' ? 90 : 70 
               }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.2)" />
               <XAxis 
                 dataKey="name" 
-                tick={{ fill: '#000000', fontSize: 11, fontWeight: 600 }}
+                tick={{ fill: '#000000', fontSize: 12, fontWeight: 600 }}
                 angle={-45}
                 textAnchor="end"
-                height={mode === 'customCountries' ? 80 : 60}
+                height={mode === 'customCountries' ? 90 : 70}
                 interval={0}
                 axisLine={{ stroke: 'rgba(0,0,0,0.4)' }}
                 tickLine={{ stroke: 'rgba(0,0,0,0.4)' }}
               />
               <YAxis 
-                tick={{ fill: '#000000', fontSize: 11, fontWeight: 600 }} 
+                tick={{ fill: '#000000', fontSize: 12, fontWeight: 600 }} 
                 axisLine={{ stroke: 'rgba(0,0,0,0.4)' }}
                 tickLine={{ stroke: 'rgba(0,0,0,0.4)' }}
               />
