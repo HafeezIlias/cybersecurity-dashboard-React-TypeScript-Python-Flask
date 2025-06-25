@@ -33,6 +33,7 @@ import RegionalChart from '../components/RegionalChart';
 import FeatureImportance from '../components/FeatureImportance';
 import CountriesTable from '../components/CountriesTable';
 import GeoChart from '../components/GeoChart';
+import ComparisonChart from '../components/ComparisonChart';
 
 interface VisualizationsPageState {
   countries: Country[];
@@ -388,9 +389,51 @@ const VisualizationsPage: React.FC = () => {
               </Grow>
             </Grid>
 
-            {/* Regional Analysis Chart */}
+            {/* Comparison Chart */}
             <Grid item xs={12}>
               <Grow in={true} timeout={1400}>
+                <Paper 
+                  sx={{ 
+                    p: 3,
+                    height: '640px',
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    backdropFilter: 'blur(30px)',
+                    borderRadius: 5,
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: '0 30px 60px rgba(0, 0, 0, 0.15)',
+                    },
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: '4px',
+                      background: 'linear-gradient(90deg, #667eea, #764ba2)',
+                      borderRadius: '5px 5px 0 0',
+                    },
+                  }}
+                >
+                  <Box display="flex" alignItems="center" mb={2}>
+                    <BarChart sx={{ fontSize: 28, mr: 1.5, color: 'primary.main' }} />
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                      📊 Interactive Comparison Analysis
+                    </Typography>
+                  </Box>
+                  <ComparisonChart countries={state.countries} />
+                </Paper>
+              </Grow>
+            </Grid>
+
+            {/* Regional Analysis Chart */}
+            <Grid item xs={12}>
+              <Grow in={true} timeout={1600}>
                 <Paper 
                   sx={{ 
                     p: 4,
@@ -433,7 +476,7 @@ const VisualizationsPage: React.FC = () => {
 
             {/* Countries Data Table */}
             <Grid item xs={12}>
-              <Grow in={true} timeout={1600}>
+              <Grow in={true} timeout={1800}>
                 <Paper 
                   sx={{ 
                     p: 4,
