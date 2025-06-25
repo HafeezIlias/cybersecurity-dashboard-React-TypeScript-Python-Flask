@@ -84,23 +84,23 @@ const ComparisonChart: React.FC<ComparisonChartProps> = ({ countries: propCountr
 
     switch (mode) {
       case 'customCountries':
-        // Custom country comparison
+        // Custom country comparison - Fixed logic
+        if (selectedCountries.length === 0) return [];
+        
         const customData = selectedCountries.map(country => {
           const data = {
             name: country.Country.length > 15 ? country.Country.substring(0, 15) + '...' : country.Country,
             fullName: country.Country,
-            CEI: typeof country.CEI === 'number' ? country.CEI : parseFloat(country.CEI) || 0,
-            GCI: typeof country.GCI === 'number' ? country.GCI : parseFloat(country.GCI) || 0,
-            NCSI: typeof country.NCSI === 'number' ? country.NCSI : parseFloat(country.NCSI) || 0,
-            DDL: typeof country.DDL === 'number' ? country.DDL : parseFloat(country.DDL) || 0,
-            'Risk Score': typeof country.Risk_Score === 'number' ? country.Risk_Score : parseFloat(country.Risk_Score) || 0,
+            CEI: Number(country.CEI) || 0,
+            GCI: Number(country.GCI) || 0,
+            NCSI: Number(country.NCSI) || 0,
+            DDL: Number(country.DDL) || 0,
+            'Risk Score': Number(country.Risk_Score) || 0,
             region: country.Region,
             riskCategory: country.Risk_Category,
           };
-          console.log('Custom country data:', data);
           return data;
         });
-        console.log('Final custom comparison data:', customData);
         return customData;
 
       case 'regions':
@@ -382,32 +382,20 @@ const ComparisonChart: React.FC<ComparisonChartProps> = ({ countries: propCountr
 
         {/* Custom Country Selection */}
         {mode === 'customCountries' && (
-          <Box sx={{ mt: 1.5, p: 2, background: 'rgba(255, 255, 255, 0.7)', borderRadius: 2 }}>
-            <Box display="flex" gap={2} alignItems="center" mb={2}>
+          <Box sx={{ mb: 2 }}>
+            {/* Single Row: Search, Clear All, and Selected Countries */}
+            <Box display="flex" gap={2} alignItems="center" flexWrap="wrap">
               <Autocomplete
-                size="small"
                 options={countries}
                 getOptionLabel={(option) => option.Country}
-                renderOption={(props, option) => {
-                  const { key, ...otherProps } = props;
-                  return (
-                    <Box component="li" key={key} {...otherProps} sx={{ fontSize: '0.875rem' }}>
-                      <Box>
-                        <Typography variant="body2" sx={{ color: '#000000' }}>{option.Country}</Typography>
-                        <Typography variant="caption" sx={{ color: 'rgba(0, 0, 0, 0.6)' }}>
-                          {option.Region} • Risk: {option.Risk_Score?.toFixed(1) || 'N/A'}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  );
-                }}
+                style={{ width: 300 }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    placeholder="Search countries to compare..."
+                    label="Search countries to compare..."
                     variant="outlined"
-                    sx={{ 
-                      minWidth: 300,
+                    size="small"
+                    sx={{
                       '& .MuiOutlinedInput-root': {
                         color: '#000000',
                         backgroundColor: 'rgba(255, 255, 255, 0.9)',
@@ -435,6 +423,7 @@ const ComparisonChart: React.FC<ComparisonChartProps> = ({ countries: propCountr
                 value={null}
                 disabled={selectedCountries.length >= 8}
               />
+              
               <Button
                 variant="outlined"
                 size="small"
@@ -445,6 +434,7 @@ const ComparisonChart: React.FC<ComparisonChartProps> = ({ countries: propCountr
                   color: 'rgba(0, 0, 0, 0.8)',
                   borderColor: 'rgba(0, 0, 0, 0.3)',
                   backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                  whiteSpace: 'nowrap',
                   '&:hover': {
                     borderColor: '#f44336',
                     color: '#f44336',
@@ -454,38 +444,38 @@ const ComparisonChart: React.FC<ComparisonChartProps> = ({ countries: propCountr
               >
                 Clear All
               </Button>
+
+              {/* Selected Countries on same row */}
+              {selectedCountries.length > 0 && (
+                <>
+                  <Typography variant="caption" sx={{ color: 'rgba(0, 0, 0, 0.8)', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                    Selected ({selectedCountries.length}/8):
+                  </Typography>
+                  <Box display="flex" gap={1} flexWrap="wrap">
+                    {selectedCountries.map((country) => (
+                      <Chip
+                        key={country.Country}
+                        label={country.Country}
+                        size="small"
+                        onDelete={() => removeCountryFromComparison(country.Country)}
+                        sx={{
+                          background: 'rgba(102, 126, 234, 0.8)',
+                          color: '#ffffff',
+                          fontWeight: 600,
+                          '& .MuiChip-deleteIcon': {
+                            color: 'rgba(255, 255, 255, 0.9)',
+                            '&:hover': { color: '#f44336' },
+                          },
+                        }}
+                      />
+                    ))}
+                  </Box>
+                </>
+              )}
             </Box>
 
-            {/* Selected Countries */}
-            {selectedCountries.length > 0 && (
-              <Box>
-                <Typography variant="caption" sx={{ color: 'rgba(0, 0, 0, 0.8)', mb: 1, display: 'block', fontWeight: 600 }}>
-                  Selected Countries ({selectedCountries.length}/8):
-                </Typography>
-                <Box display="flex" gap={1} flexWrap="wrap">
-                  {selectedCountries.map((country) => (
-                    <Chip
-                      key={country.Country}
-                      label={country.Country}
-                      size="small"
-                      onDelete={() => removeCountryFromComparison(country.Country)}
-                      sx={{
-                        background: 'rgba(102, 126, 234, 0.8)',
-                        color: '#ffffff',
-                        fontWeight: 600,
-                        '& .MuiChip-deleteIcon': {
-                          color: 'rgba(255, 255, 255, 0.9)',
-                          '&:hover': { color: '#f44336' },
-                        },
-                      }}
-                    />
-                  ))}
-                </Box>
-              </Box>
-            )}
-
             {selectedCountries.length === 0 && (
-              <Typography variant="body2" sx={{ color: 'rgba(0, 0, 0, 0.7)', fontStyle: 'italic' }}>
+              <Typography variant="body2" sx={{ color: 'rgba(0, 0, 0, 0.7)', fontStyle: 'italic', mt: 1 }}>
                 Select countries from the dropdown above to compare their cybersecurity metrics
               </Typography>
             )}
@@ -494,7 +484,7 @@ const ComparisonChart: React.FC<ComparisonChartProps> = ({ countries: propCountr
       </Box>
 
       {/* Chart */}
-      <Box sx={{ flex: 1, minHeight: 480, height: 500, overflow: 'hidden', mt: 1 }}>
+      <Box sx={{ flex: 1, minHeight: 400, height: 450, overflow: 'hidden', mt: 1 }}>
         {mode === 'customCountries' && selectedCountries.length === 0 ? (
           <Box 
             display="flex" 
@@ -525,22 +515,22 @@ const ComparisonChart: React.FC<ComparisonChartProps> = ({ countries: propCountr
                 top: 20, 
                 right: 30, 
                 left: 20, 
-                bottom: mode === 'customCountries' ? 100 : 80 
+                bottom: mode === 'customCountries' ? 80 : 60 
               }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.2)" />
               <XAxis 
                 dataKey="name" 
-                tick={{ fill: '#000000', fontSize: 12, fontWeight: 600 }}
+                tick={{ fill: '#000000', fontSize: 11, fontWeight: 600 }}
                 angle={-45}
                 textAnchor="end"
-                height={mode === 'customCountries' ? 100 : 80}
+                height={mode === 'customCountries' ? 80 : 60}
                 interval={0}
                 axisLine={{ stroke: 'rgba(0,0,0,0.4)' }}
                 tickLine={{ stroke: 'rgba(0,0,0,0.4)' }}
               />
               <YAxis 
-                tick={{ fill: '#000000', fontSize: 12, fontWeight: 600 }} 
+                tick={{ fill: '#000000', fontSize: 11, fontWeight: 600 }} 
                 axisLine={{ stroke: 'rgba(0,0,0,0.4)' }}
                 tickLine={{ stroke: 'rgba(0,0,0,0.4)' }}
               />
