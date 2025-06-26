@@ -34,6 +34,8 @@ import FeatureImportance from '../components/FeatureImportance';
 import CountriesTable from '../components/CountriesTable';
 import GeoChart from '../components/GeoChart';
 import ComparisonChart from '../components/ComparisonChart';
+import ScatterPlot from '../components/ScatterPlot';
+import ClusteringVisualization from '../components/ClusteringVisualization';
 
 interface VisualizationsPageState {
   countries: Country[];
@@ -474,9 +476,95 @@ const VisualizationsPage: React.FC = () => {
               </Grow>
             </Grid>
 
-            {/* Countries Data Table */}
+            {/* Scatter Plot Analysis */}
             <Grid item xs={12}>
               <Grow in={true} timeout={1800}>
+                <Paper 
+                  sx={{ 
+                    p: 4,
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    backdropFilter: 'blur(30px)',
+                    borderRadius: 5,
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: '0 30px 60px rgba(0, 0, 0, 0.15)',
+                    },
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: '4px',
+                      background: 'linear-gradient(90deg, #667eea, #764ba2)',
+                      borderRadius: '5px 5px 0 0',
+                    },
+                  }}
+                >
+                  <Box display="flex" alignItems="center" mb={3}>
+                    <Avatar sx={{ width: 50, height: 50, mr: 2, background: 'linear-gradient(135deg, #667eea, #764ba2)' }}>
+                      <ShowChart sx={{ fontSize: 24 }} />
+                    </Avatar>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                      📊 Scatter Plot Relationship Analysis
+                    </Typography>
+                  </Box>
+                  <ScatterPlot countries={state.countries} />
+                </Paper>
+              </Grow>
+            </Grid>
+
+            {/* Clustering Visualization */}
+            <Grid item xs={12}>
+              <Grow in={true} timeout={2000}>
+                <Paper 
+                  sx={{ 
+                    p: 4,
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    backdropFilter: 'blur(30px)',
+                    borderRadius: 5,
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: '0 30px 60px rgba(0, 0, 0, 0.15)',
+                    },
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: '4px',
+                      background: 'linear-gradient(90deg, #f093fb, #f5576c)',
+                      borderRadius: '5px 5px 0 0',
+                    },
+                  }}
+                >
+                  <Box display="flex" alignItems="center" mb={3}>
+                    <Avatar sx={{ width: 50, height: 50, mr: 2, background: 'linear-gradient(135deg, #f093fb, #f5576c)' }}>
+                      <Timeline sx={{ fontSize: 24 }} />
+                    </Avatar>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                      🎯 Clustering & Pattern Analysis
+                    </Typography>
+                  </Box>
+                  <ClusteringVisualization countries={state.countries} />
+                </Paper>
+              </Grow>
+            </Grid>
+
+            {/* Countries Data Table */}
+            <Grid item xs={12}>
+              <Grow in={true} timeout={2200}>
                 <Paper 
                   sx={{ 
                     p: 4,
